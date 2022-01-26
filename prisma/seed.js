@@ -1,16 +1,36 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+function nextDayScreeningDate( screeningHour ) {
+    const nextDate = new Date();
+    const hrsToMillis = 60 * 60 * 1000;
+    const offset = ( 24 + ( screeningHour - nextDate.getHours() ) ) * hrsToMillis;
+
+    nextDate.setTime( nextDate.getTime() + offset );
+    nextDate.setMinutes( 0 );
+    nextDate.setSeconds( 0 );
+
+    return nextDate;
+}
+
 async function seed() {
 
+    // Nested creation of Customer Contact
     const bob = await prisma.customer.create({
         data: {
-            name: 'Bobby TABLES'
+            name: 'Bobby TABLES',
+            contact: {
+                create: {
+                    phone: '0141 666 9999',
+                    email: 'bobby.TABLES@example.com'
+                }
+            }
         }
     });
 
-    console.log('Customer `Bobby TABLES` created', bob);
+    console.log('Customer/Contact `Bobby TABLES` created', bob);
 
+    // Manual creation of Customer and Contact
     const createdCustomer = await prisma.customer.create({
         data: {
             name: 'Alice'
@@ -18,8 +38,6 @@ async function seed() {
     });
 
     console.log('Customer `Alice` created', createdCustomer);
-
-    // Add your code here
 
     const createdContact = await prisma.contact.create({
         data: {
@@ -40,20 +58,7 @@ async function seed() {
 
     console.log('Movie `Dune` created', dune );
 
-    let screeningTime = new Date();
-
-    console.log( 'Time now: ', screeningTime );
-
-    // Set screening time to tomorrow at 8pm - there are libraries that will do this :)
-    const eightPM = 20;
-    const hrsToMillis = 60 * 60 * 1000;
-    const offset = ( 24 + ( eightPM - screeningTime.getHours() ) ) * hrsToMillis;
-
-    screeningTime.setTime( screeningTime.getTime() + offset );
-    screeningTime.setMinutes( 0 );
-    screeningTime.setSeconds( 0 );
-
-    console.log( 'Screening time: ', screeningTime );
+    const screeningTime = nextDayScreeningDate( 20 );
 
     const aScreening = await prisma.screening.create({
         data: {
@@ -63,6 +68,21 @@ async function seed() {
     });
 
     console.log( 'Screening for `Dune` created', aScreening );
+
+    const titane = await prisma.movie.create({
+        data: {
+            title: "Titane",
+            runTimeMins: 100,
+            screenings: {
+                create: [
+                    { startsAt: nextDayScreeningDate( 22 ) },
+                    { startsAt: nextDayScreeningDate( 24 ) }
+                ]
+            }
+        }
+    });
+
+    console.log( 'Movie `Titane` created with Screenings', titane );
 
     // Don't edit any of the code below this line
     process.exit(0);
