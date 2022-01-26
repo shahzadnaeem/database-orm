@@ -51,11 +51,11 @@ async function seed() {
 
     console.log('Contact `Alice` created - linked to Customer', createdContact);
 
+    // Screens
+
     const screen1 = await prisma.screen.create({
         data: { number: 1 }
     });
-
-    // Screens
 
     console.log('Screen 1 created', screen1);
 
@@ -112,6 +112,16 @@ async function seed() {
     });
 
     console.log( 'Movie `Titane` created with Screenings', titane );
+
+    // Tickets
+    const bobbysTicketForDune = await prisma.ticket.create({
+        data: {
+            customerId: bob.id,
+            screeningId: aScreening.id
+        }
+    });
+
+    console.log( 'Ticket for `Bobby` to see `Dune` created', bobbysTicketForDune );
 
     // Don't edit any of the code below this line
     process.exit(0);
