@@ -15,6 +15,8 @@ function nextDayScreeningDate( screeningHour ) {
 
 async function seed() {
 
+    // Customer and Contacts
+
     // Nested creation of Customer Contact
     const bob = await prisma.customer.create({
         data: {
@@ -49,6 +51,22 @@ async function seed() {
 
     console.log('Contact `Alice` created - linked to Customer', createdContact);
 
+    const screen1 = await prisma.screen.create({
+        data: { number: 1 }
+    });
+
+    // Screens
+
+    console.log('Screen 1 created', screen1);
+
+    const screen2 = await prisma.screen.create({
+        data: { number: 2 }
+    });
+
+    console.log('Screen 2 created', screen1);
+
+    // Movies and Screenings
+
     const dune = await prisma.movie.create({
         data: {
             title: "Dune",
@@ -63,6 +81,7 @@ async function seed() {
     const aScreening = await prisma.screening.create({
         data: {
             movieId:  dune.id,
+            screenId: screen1.id,
             startsAt: screeningTime
         }
     });
@@ -75,8 +94,18 @@ async function seed() {
             runTimeMins: 100,
             screenings: {
                 create: [
-                    { startsAt: nextDayScreeningDate( 22 ) },
-                    { startsAt: nextDayScreeningDate( 24 ) }
+                    {
+                        screenId: screen1.id,
+                        startsAt: nextDayScreeningDate( 22 )
+                    },
+                    {
+                        screenId: screen1.id,
+                        startsAt: nextDayScreeningDate( 24 )
+                    },
+                    {
+                        screenId: screen2.id,
+                        startsAt: nextDayScreeningDate( 20 )
+                    }
                 ]
             }
         }
