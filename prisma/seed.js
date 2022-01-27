@@ -18,7 +18,7 @@ async function seed() {
     // Customer and Contacts
 
     // Nested creation of Customer Contact
-    const bob = await prisma.customer.create({
+    const bobby = await prisma.customer.create({
         data: {
             name: 'Bobby TABLES',
             contact: {
@@ -30,7 +30,7 @@ async function seed() {
         }
     });
 
-    console.log('Customer/Contact `Bobby TABLES` created', bob);
+    console.log('Customer/Contact `Bobby TABLES` created', bobby);
 
     // Manual creation of Customer and Contact
     const createdCustomer = await prisma.customer.create({
@@ -65,6 +65,15 @@ async function seed() {
 
     console.log('Screen 2 created', screen1);
 
+    const moreScreens = await prisma.screen.createMany({
+        data: [
+            { number: 10 },
+            { number: 11 }
+        ]
+    });
+
+    console.log('Screens 10 and 11 created using createMany()');
+
     // Movies and Screenings
 
     const dune = await prisma.movie.create({
@@ -78,7 +87,7 @@ async function seed() {
 
     const screeningTime = nextDayScreeningDate( 20 );
 
-    const aScreening = await prisma.screening.create({
+    const duneScreening = await prisma.screening.create({
         data: {
             movieId:  dune.id,
             screenId: screen1.id,
@@ -86,7 +95,7 @@ async function seed() {
         }
     });
 
-    console.log( 'Screening for `Dune` created', aScreening );
+    console.log( 'Screening for `Dune` created', duneScreening );
 
     const titane = await prisma.movie.create({
         data: {
@@ -111,13 +120,13 @@ async function seed() {
         }
     });
 
-    console.log( 'Movie `Titane` created with Screenings', titane );
+    console.log( 'Movie `Titane` created with 3 Screenings', titane );
 
     // Tickets
     const bobbysTicketForDune = await prisma.ticket.create({
         data: {
-            customerId: bob.id,
-            screeningId: aScreening.id
+            customerId: bobby.id,
+            screeningId: duneScreening.id
         }
     });
 
